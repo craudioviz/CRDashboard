@@ -18,12 +18,12 @@ const registryLog = ensureLog('registry.log');
 const analyticsLog = ensureLog('analytics.log');
 const telemetryLog = ensureLog('telemetry.log');
 const scoreLog = ensureLog('score.log');
+const auditLog = ensureLog('audit.log');
 const diagnosticsLog = ensureLog('diagnostics.log');
 
 app.use(express.json());
 
-const logBoot = `[${new Date().toISOString()}] CRAIViz Sync API booted\n`;
-fs.appendFile(diagnosticsLog, logBoot, () => {});
+fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] CRAIViz Sync API booted\n`, () => {});
 
 app.post('/sync', (req, res) => {
   const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
@@ -59,15 +59,22 @@ app.post('/telemetry', (req, res) => {
 
 app.post('/score', (req, res) => {
   const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
-  const bootEntry = `[${new Date().toISOString()}] /score route registered\n`;
-  fs.appendFile(diagnosticsLog, bootEntry, () => {});
   fs.appendFile(scoreLog, logEntry, err => {
-    if (err) {
-      fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] Score log failed\n`, () => {});
-      return res.status(500).json({ status: 'error', message: 'Score log failed' });
-    }
-    fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] Score log success\n`, () => {});
+    if (err) return res.status(500).json({ status: 'error', message: 'Score log failed' });
     res.json({ status: 'success', message: 'Contributor score uploaded', timestamp: new Date().toISOString() });
+  });
+});
+
+app.post('/audit', (req, res) => {
+  const logEntry = `[${new Date().toISOString()}] AUDIT: ${JSON.stringify(req.body)}\n`;
+  fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] /audit route registered\n`, () => {});
+  fs.appendFile(auditLog, logEntry, err => {
+    if (err) {
+      fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] Audit log failed\n`, () => {});
+      return res.status(500).json({ status: "error", message: "Audit log failed" });
+    }
+    fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] Audit log success\n`, () => {});
+    res.json({ status: "success", message: "Audit trail validated", timestamp: new Date().toISOString() });
   });
 });
 
@@ -80,22 +87,3 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
-
-app.post("/audit", (req, res) => {
-  const logPath = path.join(logsDir, "audit.log");
-  const diagnosticsPath = path.join(logsDir, "diagnostics.log");
-  const logEntry = `[${new Date().toISOString()}] AUDIT: ${JSON.stringify(req.body)}\n`;
-  const bootEntry = `[${new Date().toISOString()}] /audit route registered\n`;
-
-  fs.appendFile(diagnosticsPath, bootEntry, () => {});
-  fs.appendFile(logPath, logEntry, err => {
-    if (err) {
-      fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Audit log failed\n`, () => {});
-      return res.status(500).json({ status: "error", message: "Audit log failed" });
-    }
-    fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Audit log success\n`, () => {});
-    res.json({ status: "success", message: "Audit trail validated", timestamp: new Date().toISOString() });
-  });
-});
-
-// trigger redeploy for audit endpoint
