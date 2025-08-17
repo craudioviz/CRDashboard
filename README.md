@@ -28,3 +28,4 @@ Run commands via:
 | `/persona/:email/mood`      | POST   | Update mood + log history          |
 | `/analytics/log`            | POST   | Log onboarding or UX event         |
 | `/analytics/events`         | GET    | Fetch all logged events            |
+# CRAIViz orchestration engine
