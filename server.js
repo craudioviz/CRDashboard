@@ -37,3 +37,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.listen(PORT, () => {
   console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
+
+app.post("/analytics", (req, res) => {
+  const logPath = path.join(logsDir, "analytics.log");
+  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
+  fs.appendFile(logPath, logEntry, err => {
+    if (err) return res.status(500).json({ status: "error", message: "Analytics log failed" });
+    res.json({ status: "success", message: "Analytics data uploaded", timestamp: new Date().toISOString() });
+  });
+});
+
