@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// 🧩 Middleware
 app.use(bodyParser.json());
 
 // ✅ Root route for live status
@@ -21,9 +21,11 @@ app.post('/preview', require('./deployment_scripts/preview'));
 app.post('/dashboard', require('./deployment_scripts/dashboard'));
 app.post('/inject/avatar', require('./deployment_scripts/inject_all'));
 
-// 🧠 Optional: Add more routes as needed
+// 🧠 Optional routes (uncomment as needed)
 // app.post('/rollback', require('./deployment_scripts/rollback'));
 // app.post('/score', require('./deployment_scripts/score'));
+// app.post('/modulate', require('./deployment_scripts/modulate'));
+// app.post('/orchestrate', require('./deployment_scripts/orchestrate'));
 
 // 🚀 Start server
 app.listen(PORT, () => {
