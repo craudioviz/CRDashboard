@@ -9,10 +9,15 @@ if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir);
 }
 
-app.use(express.json()); // Reintroduce payload parsing
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('CRAIViz Sync API is live');
+});
+
+// ✅ Diagnostic GET route
+app.get('/api/sync/test', (req, res) => {
+  res.status(200).json({ status: 'test-ok', timestamp: new Date().toISOString() });
 });
 
 app.post('/api/sync', (req, res) => {
