@@ -1,27 +1,27 @@
 {
   "roy": {
-    "joined": "2025-08-17T04:17:49.833Z",
+    "joined": "2025-08-17T19:33:15.340Z",
     "script": "cli/contributors/roy.sh",
     "avatar": "avatars/roy/avatar.json",
     "assets": "assets/roy",
     "status": "active"
   },
   "alex": {
-    "joined": "2025-08-17T04:17:49.895Z",
+    "joined": "2025-08-17T19:33:15.460Z",
     "script": "cli/contributors/alex.sh",
     "avatar": "avatars/alex/avatar.json",
     "assets": "assets/alex",
     "status": "active"
   },
   "jordan": {
-    "joined": "2025-08-17T04:17:49.949Z",
+    "joined": "2025-08-17T19:33:15.581Z",
     "script": "cli/contributors/jordan.sh",
     "avatar": "avatars/jordan/avatar.json",
     "assets": "assets/jordan",
     "status": "active"
   },
   "casey": {
-    "joined": "2025-08-17T04:17:50.030Z",
+    "joined": "2025-08-17T19:33:15.700Z",
     "script": "cli/contributors/casey.sh",
     "avatar": "avatars/casey/avatar.json",
     "assets": "assets/casey",
