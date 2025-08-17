@@ -4,7 +4,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 // Ensure logs folder exists
 const logsDir = path.join(__dirname, 'logs');
