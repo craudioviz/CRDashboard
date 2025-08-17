@@ -18,8 +18,12 @@ const registryLog = ensureLog('registry.log');
 const analyticsLog = ensureLog('analytics.log');
 const telemetryLog = ensureLog('telemetry.log');
 const scoreLog = ensureLog('score.log');
+const diagnosticsLog = ensureLog('diagnostics.log');
 
 app.use(express.json());
+
+const logBoot = `[${new Date().toISOString()}] CRAIViz Sync API booted\n`;
+fs.appendFile(diagnosticsLog, logBoot, () => {});
 
 app.post('/sync', (req, res) => {
   const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
@@ -55,8 +59,14 @@ app.post('/telemetry', (req, res) => {
 
 app.post('/score', (req, res) => {
   const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
+  const bootEntry = `[${new Date().toISOString()}] /score route registered\n`;
+  fs.appendFile(diagnosticsLog, bootEntry, () => {});
   fs.appendFile(scoreLog, logEntry, err => {
-    if (err) return res.status(500).json({ status: 'error', message: 'Score log failed' });
+    if (err) {
+      fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] Score log failed\n`, () => {});
+      return res.status(500).json({ status: 'error', message: 'Score log failed' });
+    }
+    fs.appendFile(diagnosticsLog, `[${new Date().toISOString()}] Score log success\n`, () => {});
     res.json({ status: 'success', message: 'Contributor score uploaded', timestamp: new Date().toISOString() });
   });
 });
@@ -70,21 +80,3 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
-
-app.post("/score", (req, res) => {
-  const logPath = path.join(logsDir, "score.log");
-  const diagnosticsPath = path.join(logsDir, "diagnostics.log");
-  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
-  const bootEntry = `[${new Date().toISOString()}] /score route registered\n`;
-
-  fs.appendFile(diagnosticsPath, bootEntry, () => {});
-  fs.appendFile(logPath, logEntry, err => {
-    if (err) {
-      fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Score log failed\n`, () => {});
-      return res.status(500).json({ status: "error", message: "Score log failed" });
-    }
-    fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Score log success\n`, () => {});
-    res.json({ status: "success", message: "Contributor score uploaded", timestamp: new Date().toISOString() });
-  });
-});
-
