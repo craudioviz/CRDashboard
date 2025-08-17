@@ -1,3 +1,5 @@
+// Force rebuild: CRAIViz sync API
+
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -16,10 +18,7 @@ app.use(express.json());
 app.post('/api/sync', (req, res) => {
   const payload = req.body;
   const timestamp = new Date().toISOString();
-  const logEntry = {
-    timestamp,
-    payload
-  };
+  const logEntry = { timestamp, payload };
 
   const logPath = path.join(logsDir, `sync-${Date.now()}.json`);
   fs.writeFileSync(logPath, JSON.stringify(logEntry, null, 2));
