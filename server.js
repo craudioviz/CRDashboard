@@ -70,3 +70,21 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
+
+app.post("/score", (req, res) => {
+  const logPath = path.join(logsDir, "score.log");
+  const diagnosticsPath = path.join(logsDir, "diagnostics.log");
+  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
+  const bootEntry = `[${new Date().toISOString()}] /score route registered\n`;
+
+  fs.appendFile(diagnosticsPath, bootEntry, () => {});
+  fs.appendFile(logPath, logEntry, err => {
+    if (err) {
+      fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Score log failed\n`, () => {});
+      return res.status(500).json({ status: "error", message: "Score log failed" });
+    }
+    fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Score log success\n`, () => {});
+    res.json({ status: "success", message: "Contributor score uploaded", timestamp: new Date().toISOString() });
+  });
+});
+
