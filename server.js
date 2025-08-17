@@ -80,3 +80,21 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
+
+app.post("/audit", (req, res) => {
+  const logPath = path.join(logsDir, "audit.log");
+  const diagnosticsPath = path.join(logsDir, "diagnostics.log");
+  const logEntry = `[${new Date().toISOString()}] AUDIT: ${JSON.stringify(req.body)}\n`;
+  const bootEntry = `[${new Date().toISOString()}] /audit route registered\n`;
+
+  fs.appendFile(diagnosticsPath, bootEntry, () => {});
+  fs.appendFile(logPath, logEntry, err => {
+    if (err) {
+      fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Audit log failed\n`, () => {});
+      return res.status(500).json({ status: "error", message: "Audit log failed" });
+    }
+    fs.appendFile(diagnosticsPath, `[${new Date().toISOString()}] Audit log success\n`, () => {});
+    res.json({ status: "success", message: "Audit trail validated", timestamp: new Date().toISOString() });
+  });
+});
+
