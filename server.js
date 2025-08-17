@@ -59,3 +59,9 @@ app.post("/telemetry", (req, res) => {
 });
 
 // trigger redeploy for telemetry
+
+// Fallback for unmatched routes
+app.use((req, res) => {
+  res.status(404).json({ status: "error", message: "Route not found" });
+});
+
