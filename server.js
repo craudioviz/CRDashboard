@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 10000;
+const port = process.env.PORT || 3000;
 
 // Ensure logs folder exists
 const logsDir = path.join(__dirname, 'logs');
@@ -32,6 +32,6 @@ app.get('/', (req, res) => {
   res.send('CRAIViz Sync API is live');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
