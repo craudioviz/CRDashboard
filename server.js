@@ -16,6 +16,8 @@ const ensureLog = (filename) => {
 const uploadLog = ensureLog('upload.log');
 const registryLog = ensureLog('registry.log');
 const analyticsLog = ensureLog('analytics.log');
+const telemetryLog = ensureLog('telemetry.log');
+const scoreLog = ensureLog('score.log');
 
 app.use(express.json());
 
@@ -43,36 +45,28 @@ app.post('/analytics', (req, res) => {
   });
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.listen(PORT, () => {
-  console.log(`CRAIViz Sync API running on port ${PORT}`);
-});
-
-app.post("/telemetry", (req, res) => {
-  const logPath = path.join(logsDir, "telemetry.log");
+app.post('/telemetry', (req, res) => {
   const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
-  fs.appendFile(logPath, logEntry, err => {
-    if (err) return res.status(500).json({ status: "error", message: "Telemetry log failed" });
-    res.json({ status: "success", message: "Emotional telemetry uploaded", timestamp: new Date().toISOString() });
+  fs.appendFile(telemetryLog, logEntry, err => {
+    if (err) return res.status(500).json({ status: 'error', message: 'Telemetry log failed' });
+    res.json({ status: 'success', message: 'Emotional telemetry uploaded', timestamp: new Date().toISOString() });
   });
 });
 
-// trigger redeploy for telemetry
+app.post('/score', (req, res) => {
+  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
+  fs.appendFile(scoreLog, logEntry, err => {
+    if (err) return res.status(500).json({ status: 'error', message: 'Score log failed' });
+    res.json({ status: 'success', message: 'Contributor score uploaded', timestamp: new Date().toISOString() });
+  });
+});
 
-// Fallback for unmatched routes
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use((req, res) => {
   res.status(404).json({ status: "error", message: "Route not found" });
 });
 
-
-app.post("/score", (req, res) => {
-  const logPath = path.join(logsDir, "score.log");
-  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
-  fs.appendFile(logPath, logEntry, err => {
-    if (err) return res.status(500).json({ status: "error", message: "Score log failed" });
-    res.json({ status: "success", message: "Contributor score uploaded", timestamp: new Date().toISOString() });
-  });
+app.listen(PORT, () => {
+  console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
-
-// trigger redeploy for score endpoint
