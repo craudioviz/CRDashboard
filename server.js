@@ -48,3 +48,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.listen(PORT, () => {
   console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
+
+app.post("/telemetry", (req, res) => {
+  const logPath = path.join(logsDir, "telemetry.log");
+  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
+  fs.appendFile(logPath, logEntry, err => {
+    if (err) return res.status(500).json({ status: "error", message: "Telemetry log failed" });
+    res.json({ status: "success", message: "Emotional telemetry uploaded", timestamp: new Date().toISOString() });
+  });
+});
+
