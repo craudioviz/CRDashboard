@@ -65,3 +65,13 @@ app.use((req, res) => {
   res.status(404).json({ status: "error", message: "Route not found" });
 });
 
+
+app.post("/score", (req, res) => {
+  const logPath = path.join(logsDir, "score.log");
+  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(req.body)}\n`;
+  fs.appendFile(logPath, logEntry, err => {
+    if (err) return res.status(500).json({ status: "error", message: "Score log failed" });
+    res.json({ status: "success", message: "Contributor score uploaded", timestamp: new Date().toISOString() });
+  });
+});
+
