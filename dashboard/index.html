@@ -1,29 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Contributor Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
-    h1 { color: #333; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 0.5em 0; }
-    a { text-decoration: none; color: #007acc; }
+    body { font-family: sans-serif; margin: 2em; background: #f9f9f9; }
+    .panel { background: white; padding: 1em; margin-bottom: 2em; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2, h3 { margin-top: 0; }
+    pre { background: #eee; padding: 1em; border-radius: 6px; overflow-x: auto; }
+    select, button { padding: 0.5em; margin-top: 1em; }
   </style>
 </head>
 <body>
-  <h1>👥 Contributor Dashboard</h1>
-  <ul id="list"></ul>
-  <script>
-    fetch('../backend/data/contributors.json')
-      .then(res => res.json())
-      .then(data => {
-        const ul = document.getElementById('list');
-        Object.keys(data).forEach(name => {
-          const li = document.createElement('li');
-          li.innerHTML = `<a href="./${name}.html">${name}</a>`;
-          ul.appendChild(li);
-        });
+
+  <div class="panel contributor-summary">
+    <h2>👤 Contributor Dashboard</h2>
+    <label for="contributorSelect">Select Contributor:</label>
+    <select id="contributorSelect" onchange="loadContributor(this.value)">
+      <option value="contrib-001">contrib-001</option>
+      <option value="contrib-002">contrib-002</option>
+    </select>
+    <ul id="contributorDetails">
+      <li><strong>Avatar:</strong> ModuloMuse</li>
+      <li><strong>Emotion:</strong> Curious</li>
+      <li><strong>Score:</strong> 1.0</li>
+      <li><strong>Feedback:</strong> 💡 Smooth transitions, intuitive modulation</li>
+      <li><strong>Last Modulated:</strong> 2025-08-17 11:08:20</li>
+    </ul>
+    <button onclick="triggerRollback()">Rollback Last Modulation</button>
+  </div>
+
+  <div class="panel avatar-preview">
+    <h3>🎭 Avatar Preview</h3>
+    <p><strong>ModuloMuse</strong> is emotionally tuned to <em>curious</em>. Expect exploratory tone and adaptive phrasing.</p>
+  </div>
+
+  <div class="panel emotion-chart">
+    <h3>📈 Emotional Telemetry</h3>
+    <canvas id="emotionChart" width="600" height="300"></canvas>
+    <script>
+      const ctx = document.getElementById('emotionChart').getContext('2d');
+      const emotionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['10:55', '11:00', '11:05', '11:08'],
+          datasets: [{
+            label: 'Emotion Score',
+            data: [0.7, 0.8, 0.9, 1.0],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            fill: false
+          }]
+        }
       });
+    </script>
+  </div>
+
+  <div class="panel audit-log">
+    <h3>📝 Audit Trail</h3>
+    <pre id="auditContent">Loading...</pre>
+    <script>
+      async function loadAuditLog() {
+        try {
+          const response = await fetch('../logs/audit.log');
+          const text = await response.text();
+          document.getElementById('auditContent').textContent = text;
+        } catch (err) {
+          document.getElementById('auditContent').textContent = 'Error loading audit log.';
+        }
+      }
+      loadAuditLog();
+      setInterval(loadAuditLog, 5000);
+    </script>
+  </div>
+
+  <script>
+    function loadContributor(id) {
+      document.getElementById('contributorDetails').innerHTML = `
+        <li><strong>Avatar:</strong> ModuloMuse</li>
+        <li><strong>Emotion:</strong> Curious</li>
+        <li><strong>Score:</strong> 1.0</li>
+        <li><strong>Feedback:</strong> 💡 Smooth transitions, intuitive modulation</li>
+        <li><strong>Last Modulated:</strong> 2025-08-17 11:08:20</li>
+      `;
+    }
+
+    function triggerRollback() {
+      alert('Rollback triggered for ModuloMuse (stub only)');
+    }
   </script>
+
 </body>
 </html>
