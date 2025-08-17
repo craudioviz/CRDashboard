@@ -52,3 +52,9 @@ app.post("/registry", (req, res) => {
 });
 
 // trigger redeploy
+
+const registryLogPath = path.join(logsDir, "registry.log");
+if (!fs.existsSync(registryLogPath)) {
+  fs.writeFileSync(registryLogPath, "");
+}
+
