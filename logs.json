@@ -1,0 +1,65 @@
+[
+  {
+    "timestamp": "2025-08-17T03:48:15.949Z",
+    "persona": {
+      "avatar": "visionary",
+      "mood": "energized",
+      "history": [
+        {
+          "mood": "energized",
+          "timestamp": 1755402483766,
+          "trigger": "onboard"
+        }
+      ]
+    },
+    "moodUpdate": {
+      "message": "Mood updated",
+      "persona": {
+        "avatar": "visionary",
+        "mood": "focused",
+        "history": [
+          {
+            "mood": "energized",
+            "timestamp": 1755402483766,
+            "trigger": "onboard"
+          },
+          {
+            "mood": "focused",
+            "timestamp": 1755402496143,
+            "trigger": "CLI test"
+          }
+        ]
+      }
+    },
+    "eventLog": {
+      "message": "Event logged",
+      "total": 1
+    },
+    "dashboard": {
+      "persona": {
+        "avatar": "visionary",
+        "mood": "focused",
+        "history": [
+          {
+            "mood": "energized",
+            "timestamp": 1755402483766,
+            "trigger": "onboard"
+          },
+          {
+            "mood": "focused",
+            "timestamp": 1755402496143,
+            "trigger": "CLI test"
+          }
+        ]
+      },
+      "events": [
+        {
+          "email": "royhenderson@craudiovizai.com",
+          "event": "test_run",
+          "context": "CLI simulation",
+          "timestamp": 1755402496146
+        }
+      ]
+    }
+  }
+]

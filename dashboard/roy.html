@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Roy's Contributor Dashboard</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
+    h1 { color: #333; }
+    pre { background: #fff; padding: 1em; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>👤 Roy's Contributor Dashboard</h1>
+  <h2>📇 Registry</h2>
+  <pre id="registry"></pre>
+  <h2>🧬 Avatar</h2>
+  <pre id="avatar"></pre>
+  <script>
+    fetch('../backend/data/contributors.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('registry').textContent = JSON.stringify(data.roy, null, 2);
+      });
+
+    fetch('../avatars/roy/avatar.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('avatar').textContent = JSON.stringify(data, null, 2);
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+ROOT="/mnt/c/craiviz"
+LOG="$ROOT/logs/injection.log"
+CMD="$1"
+TARGET="$2"
+TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+
+case "$CMD" in
+  init)
+    "$ROOT/scripts/crai-init.sh"
+    ;;
+  inject)
+    "$ROOT/scripts/crai-inject.sh" "$TARGET"
+    ;;
+  rollback)
+    "$ROOT/scripts/crai-rollback.sh" "$TARGET"
+    ;;
+  log)
+    "$ROOT/scripts/crai-log.sh"
+    ;;
+  preview)
+    "$ROOT/scripts/crai-preview.sh" "$TARGET"
+    ;;
+  ux)
+    "$ROOT/scripts/crai-ux.sh" "$TARGET"
+    ;;
+  *)
+    echo "❌ Unknown command: $CMD"
+    echo "Usage: crai <init|inject|rollback|log|preview|ux> [controller.js]"
+    exit 1
+    ;;
+esac
+
+echo "$TIMESTAMP | crai: executed '$CMD $TARGET'" >> "$LOG"

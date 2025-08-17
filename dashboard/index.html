@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contributor Dashboard</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
+    h1 { color: #333; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.5em 0; }
+    a { text-decoration: none; color: #007acc; }
+  </style>
+</head>
+<body>
+  <h1>👥 Contributor Dashboard</h1>
+  <ul id="list"></ul>
+  <script>
+    fetch('../backend/data/contributors.json')
+      .then(res => res.json())
+      .then(data => {
+        const ul = document.getElementById('list');
+        Object.keys(data).forEach(name => {
+          const li = document.createElement('li');
+          li.innerHTML = `<a href="./${name}.html">${name}</a>`;
+          ul.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
