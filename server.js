@@ -1,33 +1,36 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-// 🧩 Middleware
-app.use(bodyParser.json());
-
-// ✅ Root route for live status
-app.get('/', (req, res) => {
-  res.json({
-    status: "CRAIViz orchestration engine live",
-    timestamp: new Date().toISOString(),
-    audit_mode: process.env.AUDIT_MODE === "true",
-    contributor: process.env.CONTRIBUTOR_ID || "unknown"
-  });
+app.use((req, res, next) => {
+  const contributorId = process.env.CONTRIBUTOR_ID;
+  if (!contributorId) {
+    console.warn('⚠️ Contributor ID missing in environment.');
+    return res.status(500).send('Contributor ID missing.');
+  }
+  req.contributorId = contributorId;
+  next();
 });
 
-// 🔧 Orchestration routes
-app.post('/preview', require('./deployment_scripts/preview'));
-app.post('/dashboard', require('./deployment_scripts/dashboard'));
-app.post('/inject/avatar', require('./deployment_scripts/inject_all'));
+app.get('/', (req, res) => {
+  res.send(`✅ CRDashboard-1 is live for contributor: ${req.contributorId}`);
+});
 
-// 🧠 Optional routes (uncomment as needed)
-// app.post('/rollback', require('./deployment_scripts/rollback'));
-// app.post('/score', require('./deployment_scripts/score'));
-// app.post('/modulate', require('./deployment_scripts/modulate'));
-// app.post('/orchestrate', require('./deployment_scripts/orchestrate'));
+app.post('/telemetry', express.json(), (req, res) => {
+  const payload = {
+    contributor: req.contributorId,
+    timestamp: new Date().toISOString(),
+    data: req.body,
+  };
 
-// 🚀 Start server
-app.listen(PORT, () => {
-  console.log(`🚀 CRAIViz Sync API live on assigned port: ${PORT}`);
+  console.log('📡 Telemetry received:', JSON.stringify(payload, null, 2));
+  res.status(200).json({ status: 'ok', received: payload });
+});
+
+app.get('/audit', (req, res) => {
+  res.send(`📝 Audit log placeholder for ${req.contributorId}`);
+});
+
+app.listen(port, () => {
+  console.log(`🚀 CRDashboard-1 running on port ${port}`);
 });
