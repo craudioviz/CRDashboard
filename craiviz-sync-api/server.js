@@ -1,8 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3100;
+
+// ✅ Ensure logs/ folder exists
+const logDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
 
 app.use(bodyParser.json());
 
@@ -15,10 +22,10 @@ app.post('/upload', (req, res) => {
     dashboard_summary: req.body.dashboard_summary
   };
 
-  fs.appendFileSync('logs/upload.log', JSON.stringify(log) + '\n');
+  fs.appendFileSync(path.join(logDir, 'upload.log'), JSON.stringify(log) + '\n');
   res.status(200).send({ status: 'success', received: log });
 });
 
 app.listen(PORT, () => {
-  console.log();
+  console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
