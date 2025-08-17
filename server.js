@@ -1,5 +1,3 @@
-// CRAIViz Sync API — Diagnostic Patch + Audit Logging
-
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -11,36 +9,19 @@ if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir);
 }
 
-app.use(express.json());
+app.use(express.json()); // Reintroduce payload parsing
 
-// Health check route
 app.get('/', (req, res) => {
   res.send('CRAIViz Sync API is live');
 });
 
-// Sync endpoint with diagnostics
 app.post('/api/sync', (req, res) => {
-  console.log('🔔 Incoming POST /api/sync');
-  console.log('📨 Headers:', req.headers);
+  console.log('🔔 POST /api/sync triggered');
   console.log('📦 Body:', req.body);
 
-  const payload = req.body || {};
-  const timestamp = new Date().toISOString();
-
-  const logEntry = {
-    timestamp,
-    trigger: payload.trigger || 'unknown',
-    source: payload.source || 'unknown',
-    raw: payload
-  };
-
-  const logPath = path.join(logsDir, `sync-${Date.now()}.json`);
-  fs.writeFileSync(logPath, JSON.stringify(logEntry, null, 2));
-
-  res.status(200).json({ status: 'success', timestamp });
+  res.status(200).json({ status: 'received', timestamp: new Date().toISOString() });
 });
 
-// Start server
 app.listen(port, () => {
   console.log(`🚀 CRAIViz Sync API live on assigned port: ${port}`);
 });
