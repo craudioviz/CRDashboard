@@ -1,6 +1,5 @@
-const fs = require('fs');
-module.exports = function logAudit(action, contributorId, context) {
-  const timestamp = new Date().toISOString();
-  const entry = `${timestamp} | ${action} | ${contributorId} | ${context}\n`;
-  fs.appendFileSync('logs/audit.log', entry);
-};
+export function loadAuditLog() {
+  return fetch('../logs/audit.log')
+    .then(res => res.text())
+    .then(text => document.getElementById('auditContent').textContent = text);
+}

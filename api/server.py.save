@@ -1,0 +1,28 @@
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "alive"}), 200from flask import Flask, request, jsonify
+import subprocess
+
+app = Flask(__name__)
+
+@app.route('/modulate', methods=['POST'])
+def modulate():
+    avatar = request.json.get('avatar')
+    emotion = request.json.get('emotion')
+    subprocess.run(['python3', 'cli/plugins/avatar_modulator.py', '--avatar', avatar, '--emotion', emotion])
+    return jsonify({"status": "modulated", "avatar": avatar, "emotion": emotion})
+
+@app.route('/rollback', methods=['POST'])
+def rollback():
+    avatar = request.json.get('avatar')
+    checkpoint = request.json.get('checkpoint')
+    subprocess.run(['python3', 'cli/plugins/rollback_manager.py', '--avatar', avatar, '--checkpoint', checkpoint])
+    return jsonify({"status": "rollback triggered", "avatar": avatar})
+
+@app.route('/audit', methods=['GET'])
+def audit():
+    with open('logs/audit.log') as f:
+        return f.read(), 200, {'Content-Type': 'text/plain'}
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)

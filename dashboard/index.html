@@ -92,3 +92,14 @@
 
 </body>
 </html>
+
+<!-- Enhancement Modules -->
+<canvas id="sentimentHeatmap" width="400" height="50"></canvas>
+<script type="module">
+  import { renderSentimentHeatmap } from '../modules/sentimentMap.js';
+  import { loadTelemetry } from '../modules/telemetry.js';
+  import { loadAuditLog } from '../modules/audit.js';
+
+  loadTelemetry('contrib-001').then(data => renderSentimentHeatmap(data));
+  loadAuditLog();
+</script>
