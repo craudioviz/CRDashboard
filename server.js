@@ -35,3 +35,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.listen(PORT, () => {
   console.log(`CRAIViz Sync API running on port ${PORT}`);
 });
+
+app.post("/registry", (req, res) => {
+  const payload = req.body;
+  const fs = require("fs");
+  const path = require("path");
+  const logPath = path.join(__dirname, "logs", "registry.log");
+  const logEntry = `[${new Date().toISOString()}] ${JSON.stringify(payload)}\n`;
+  fs.appendFile(logPath, logEntry, (err) => {
+    if (err) {
+      console.error("Registry log failed:", err);
+      return res.status(500).json({ status: "error", message: "Registry log failed" });
+    }
+    res.json({ status: "success", message: "Contributor registry uploaded", timestamp: new Date().toISOString() });
+  });
+});
+
