@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRAIViz Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>CRAIViz Contributor Dashboard</h1>
+
+  <section id="avatar">
+    <label for="persona">Choose Avatar:</label>
+    <select id="persona">
+      <option value="visionary">Visionary</option>
+      <option value="strategist">Strategist</option>
+      <option value="empath">Empath</option>
+    </select>
+  </section>
+
+  <section id="dashboard-form">
+    <h2>Submit Dashboard</h2>
+    <textarea id="dashboardData" placeholder="Enter contributor data..."></textarea>
+    <button onclick="submitDashboard()">Submit</button>
+  </section>
+
+  <section id="rollback">
+    <h2>Rollback Viewer</h2>
+    <input type="text" id="rollbackFilename" placeholder="dashboard-*.json" />
+    <button onclick="restoreRollback()">Restore</button>
+    <pre id="rollbackOutput"></pre>
+  </section>
+
+  <section id="sentiment">
+    <h2>Sentiment Chart</h2>
+    <button onclick="loadSentiment()">Load Preview</button>
+    <pre id="sentimentOutput"></pre>
+  </section>
+
+  <section id="feedback">
+    <h2>Submit Feedback</h2>
+    <textarea id="feedbackData" placeholder="Enter emotional feedback..."></textarea>
+    <button onclick="submitFeedback()">Send Feedback</button>
+  </section>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

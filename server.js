@@ -1,97 +1,69 @@
-const express = require('express');
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.static("public")); // Optional: serve frontend from /public
 
-// Middleware: Validate contributor context
-app.use((req, res, next) => {
-  const contributorId = process.env.CONTRIBUTOR_ID;
-  if (!contributorId) {
-    console.warn('⚠️ Contributor ID missing in environment.');
-    return res.status(500).send('Contributor ID missing.');
-  }
-  req.contributorId = contributorId;
-  next();
+// ✅ Root route confirmation
+app.get("/", (req, res) => {
+  res.send("CRAIViz backend is live and audit-logged.");
 });
 
-// Root route
-app.get('/', (req, res) => {
-  res.send(`✅ CRDashboard-1 is live for contributor: ${req.contributorId}`);
+// ✅ Dashboard submission
+app.post("/dashboard", (req, res) => {
+  const data = req.body;
+  const filename = `logs/dashboard-${Date.now()}.json`;
+  fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+  res.status(200).send({ status: "Dashboard saved", file: filename });
 });
 
-// Telemetry route
-app.post('/telemetry', (req, res) => {
-  const payload = {
-    contributor: req.contributorId,
-    timestamp: new Date().toISOString(),
-    data: req.body,
-  };
-
-  console.log('📡 Telemetry received:', JSON.stringify(payload, null, 2));
-
-  // Trigger AuditBot
-  auditLog.push({
-    contributor: req.contributorId,
-    timestamp: payload.timestamp,
-    event: req.body.event || 'unknown',
-    payload: req.body,
-  });
-
-  // Trigger ScoreBot
-  const score = {
-    clarity_score: Math.floor(Math.random() * 30) + 70,
-    modularity_score: Math.floor(Math.random() * 30) + 70,
-    empathy_score: Math.floor(Math.random() * 30) + 70,
-    audit_score: 100,
-  };
-  lastScore = score;
-
-  // Trigger Dashboard if applicable
-  if (req.body.event === 'dashboard_launch') {
-    dashboardTriggered = true;
-  }
-
-  // Simulate Javai decision
-  javaiLog.push({
-    contributor: req.contributorId,
-    timestamp: payload.timestamp,
-    bot: 'ScoreBot',
-    action: score.clarity_score < 75 ? 'Flagged for review' : 'Accepted',
-  });
-
-  res.status(200).json({ status: 'ok', received: payload });
-});
-
-// Audit route
-const auditLog = [];
-app.get('/audit', (req, res) => {
-  res.json({ contributor: req.contributorId, log: auditLog });
-});
-
-// Score route
-let lastScore = {};
-app.get('/score', (req, res) => {
-  res.json({ contributor: req.contributorId, score: lastScore });
-});
-
-// Dashboard route
-let dashboardTriggered = false;
-app.get('/dashboard', (req, res) => {
-  if (dashboardTriggered) {
-    res.send(`📊 Dashboard triggered for ${req.contributorId}`);
+// ✅ Rollback restore
+app.get("/rollback/:filename", (req, res) => {
+  const filePath = path.join("logs", req.params.filename);
+  if (fs.existsSync(filePath)) {
+    const data = fs.readFileSync(filePath);
+    res.status(200).send(JSON.parse(data));
   } else {
-    res.send(`🕒 No dashboard trigger yet for ${req.contributorId}`);
+    res.status(404).send({ error: "File not found" });
   }
 });
 
-// Javai decision log
-const javaiLog = [];
-app.get('/javai', (req, res) => {
-  res.json({ contributor: req.contributorId, decisions: javaiLog });
+// ✅ Sentiment preview
+app.get("/dashboard-preview", (req, res) => {
+  const files = fs.readdirSync("logs").filter(f => f.startsWith("dashboard"));
+  const latest = files.sort().reverse()[0];
+  if (latest) {
+    const data = fs.readFileSync(path.join("logs", latest));
+    res.status(200).send(JSON.parse(data));
+  } else {
+    res.status(404).send({ error: "No dashboard found" });
+  }
 });
 
-// Start server
-app.listen(port, () => {
-  console.log(`🚀 CRDashboard-1 running on port ${port}`);
+// ✅ Emotional telemetry
+app.post("/telemetry", (req, res) => {
+  const data = req.body;
+  const filename = `logs/telemetry-${Date.now()}.json`;
+  fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+  res.status(200).send({ status: "Telemetry saved", file: filename });
+});
+
+// ✅ Feedback logging
+app.post("/feedback", (req, res) => {
+  const data = req.body;
+  const filename = `logs/feedback-${Date.now()}.json`;
+  fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+  res.status(200).send({ status: "Feedback saved", file: filename });
+});
+
+// ✅ Ensure logs folder exists
+if (!fs.existsSync("logs")) {
+  fs.mkdirSync("logs");
+}
+
+app.listen(PORT, () => {
+  console.log(`CRAIViz backend running on port ${PORT}`);
 });
