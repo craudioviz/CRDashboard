@@ -3,46 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CRAIViz Dashboard</title>
+  <title>CRAIViz Contributor Portal</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>CRAIViz Contributor Dashboard</h1>
+  <header>
+    <h1>CRAIViz Contributor Dashboard</h1>
+    <p>Emotionally intelligent. Audit-logged. Scalable.</p>
+  </header>
 
-  <section id="avatar">
-    <label for="persona">Choose Avatar:</label>
-    <select id="persona">
-      <option value="visionary">Visionary</option>
-      <option value="strategist">Strategist</option>
-      <option value="empath">Empath</option>
-    </select>
-  </section>
+  <main class="grid">
+    <section class="card" id="onboarding">
+      <h2>🧾 Onboarding</h2>
+      <input type="text" id="contributorID" placeholder="Contributor ID" />
+      <select id="persona">
+        <option value="visionary">Visionary</option>
+        <option value="strategist">Strategist</option>
+        <option value="empath">Empath</option>
+      </select>
+      <button onclick="startOnboarding()">Begin</button>
+    </section>
 
-  <section id="dashboard-form">
-    <h2>Submit Dashboard</h2>
-    <textarea id="dashboardData" placeholder="Enter contributor data..."></textarea>
-    <button onclick="submitDashboard()">Submit</button>
-  </section>
+    <section class="card" id="dashboard">
+      <h2>📝 Submit Dashboard</h2>
+      <textarea id="dashboardData" placeholder="Enter data..."></textarea>
+      <button onclick="submitDashboard()">Submit</button>
+    </section>
 
-  <section id="rollback">
-    <h2>Rollback Viewer</h2>
-    <input type="text" id="rollbackFilename" placeholder="dashboard-*.json" />
-    <button onclick="restoreRollback()">Restore</button>
-    <pre id="rollbackOutput"></pre>
-  </section>
+    <section class="card" id="chart">
+      <h2>📈 Contributor Scoring</h2>
+      <canvas id="scoreChart"></canvas>
+    </section>
 
-  <section id="sentiment">
-    <h2>Sentiment Chart</h2>
-    <button onclick="loadSentiment()">Load Preview</button>
-    <pre id="sentimentOutput"></pre>
-  </section>
+    <section class="card" id="telemetry">
+      <h2>📡 Emotional Telemetry</h2>
+      <textarea id="feedbackData" placeholder="Enter emotional feedback..."></textarea>
+      <button onclick="submitFeedback()">Send</button>
+      <pre id="telemetryStream"></pre>
+    </section>
 
-  <section id="feedback">
-    <h2>Submit Feedback</h2>
-    <textarea id="feedbackData" placeholder="Enter emotional feedback..."></textarea>
-    <button onclick="submitFeedback()">Send Feedback</button>
-  </section>
+    <section class="card" id="rollback">
+      <h2>🔄 Rollback Viewer</h2>
+      <input type="text" id="rollbackFilename" placeholder="dashboard-*.json" />
+      <button onclick="restoreRollback()">Restore</button>
+      <pre id="rollbackOutput"></pre>
+    </section>
+
+    <section class="card" id="admin">
+      <h2>📊 Admin Analytics</h2>
+      <button onclick="exportPDF()">Export PDF</button>
+      <button onclick="generatePitch()">Generate Pitch Deck</button>
+      <pre id="adminLogs"></pre>
+    </section>
+  </main>
+
+  <footer>
+    <p>CRAIViz © 2025 — Powered by emotional intelligence</p>
+  </footer>
 
   <script src="dashboard.js"></script>
+  <script src="chart.js"></script>
+  <script src="avatars.js"></script>
+  <script src="telemetry.js"></script>
+  <script src="onboarding.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>

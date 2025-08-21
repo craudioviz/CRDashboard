@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+
+usage() {
+  cat <<'USAGE'
+crav — helper for CRAV scripts
+
+Usage:
+  crav new <name>        Create scripts/<name>.sh or known templates (python_app, node_app)
+  crav run <name>        Run scripts/<name>.sh
+  crav list              List available scripts
+  crav rm <name>         Safely move scripts/<name>.sh to scripts/.trash/
+  crav push "<msg>"      Commit all changes with <msg> and push to origin/main
+  crav health            Write/commit a timestamped .healthcheck and push
+  crav sync              git pull --rebase; show status
+
+Examples:
+  crav new backup_db
+  crav new python_app && crav run python_app
+  crav new node_app   && crav run node_app
+USAGE
+}
+
+ensure_repo() { cd "$ROOT"; git rev-parse --git-dir >/dev/null 2>&1 || { echo "Not a git repo at $ROOT"; exit 1; }; }
+
+# --- TEMPLATES ---------------------------------------------------------------
+
+mk_python_app_script() {
+  mkdir -p "$ROOT/scripts"
+  cat > "$ROOT/scripts/python_app.sh" <<'PYBASH'
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+APP="$ROOT/apps/python_app"
+mkdir -p "$APP"
+cd "$APP"
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+printf 'requests\n' > requirements.txt
+pip install -r requirements.txt
+cat > main.py <<'PY'
+import requests
+print("python_app OK")
+PY
+python main.py
+PYBASH
+  chmod +x "$ROOT/scripts/python_app.sh"
+}
+
+mk_node_app_script() {
+  mkdir -p "$ROOT/scripts"
+  cat > "$ROOT/scripts/node_app.sh" <<'NJBASH'
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+APP="$ROOT/apps/node_app"
+mkdir -p "$APP"
+cd "$APP"
+if [ ! -f package.json ]; then npm init -y >/dev/null 2>&1; fi
+npm pkg set type=module >/dev/null
+cat > index.js <<'JS'
+console.log("node_app OK");
+JS
+node index.js
+NJBASH
+  chmod +x "$ROOT/scripts/node_app.sh"
+}
+
+# --- COMMANDS ----------------------------------------------------------------
+
+cmd_new() {
+  ensure_repo
+  local name="${1:-}"
+  [ -z "$name" ] && { echo "Specify a name: crav new <name>"; exit 1; }
+  case "$name" in
+    python_app)
+      [ -x "$ROOT/scripts/python_app.sh" ] || { mk_python_app_script; git add "$ROOT/scripts/python_app.sh"; git commit -m "feat: add python_app template" || true; }
+      ;;
+    node_app)
+      [ -x "$ROOT/scripts/node_app.sh" ]   || { mk_node_app_script;   git add "$ROOT/scripts/node_app.sh";   git commit -m "feat: add node_app template"   || true; }
+      ;;
+    *)
+      mkdir -p "$ROOT/scripts"
+      local f="$ROOT/scripts/${name}.sh"
+      if [ -e "$f" ]; then
+        echo "File exists: scripts/${name}.sh"
+      else
+        cat > "$f" <<'GEN'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Running: ${0##*/}"
+# TODO: your commands here
+GEN
+        chmod +x "$f"
+        echo "Created scripts/${name}.sh"
+        git add "$f"
+        git commit -m "feat: add ${name}.sh" || true
+      fi
+      ;;
+  esac
+}
+
+cmd_run() {
+  ensure_repo
+  local name="${1:-}"
+  [ -z "$name" ] && { echo "Specify a name: crav run <name>"; exit 1; }
+  local f="$ROOT/scripts/${name}.sh"
+  [ -x "$f" ] || { echo "Missing or not executable: scripts/${name}.sh"; exit 1; }
+  "$f"
+}
+
+cmd_list() {
+  ensure_repo
+  echo "Available scripts:"
+  find "$ROOT/scripts" -maxdepth 1 -type f -name '*.sh' -printf '  - %f\n' 2>/dev/null | sort
+}
+
+cmd_rm() {
+  ensure_repo
+  local name="${1:-}"
+  [ -z "$name" ] && { echo "Specify a name: crav rm <name>"; exit 1; }
+  local f="$ROOT/scripts/${name}.sh"
+  [ -e "$f" ] || { echo "Not found: scripts/${name}.sh"; exit 1; }
+  mkdir -p "$ROOT/scripts/.trash"
+  local ts; ts="$(date +%Y%m%d-%H%M%S)"
+  local dest="$ROOT/scripts/.trash/${ts}-${name}.sh"
+  mv "$f" "$dest"
+  git add -A
+  git commit -m "chore: trash scripts/${name}.sh -> scripts/.trash/${ts}-${name}.sh" || true
+  git push -u origin main
+  echo "Moved to trash: scripts/.trash/${ts}-${name}.sh"
+}
+
+cmd_push() {
+  ensure_repo
+  local msg="${1:-}"
+  [ -z "$msg" ] && { echo 'Specify a commit message: crav push "your message"'; exit 1; }
+  git add -A
+  git commit -m "$msg" || true
+  git branch -M main
+  git push -u origin main
+}
+
+cmd_health() {
+  ensure_repo
+  date +"%Y-%m-%d %H:%M:%S %Z" > "$ROOT/.healthcheck"
+  git add .healthcheck
+  git commit -m "chore: update healthcheck" || true
+  git push -u origin main
+  echo "Healthcheck updated."
+}
+
+cmd_sync() {
+  ensure_repo
+  git pull --rebase --autostash || true
+  git status --short --branch
+}
+
+case "${1:-}" in
+  new)    shift; cmd_new "$@";;
+  run)    shift; cmd_run "$@";;
+  list)   shift; cmd_list;;
+  rm)     shift; cmd_rm "$@";;
+  push)   shift; cmd_push "$@";;
+  health) shift; cmd_health;;
+  sync)   shift; cmd_sync;;
+  ""|-h|--help) usage;;
+  *) echo "Unknown command: $1"; usage; exit 1;;
+esac

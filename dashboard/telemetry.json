@@ -1,0 +1,6 @@
+{
+  "CRAI": { "orchestration": true, "emotion": "neutral" },
+  "Javari": { "deploy": true, "emotion": "focused" },
+  "Vizara": { "dashboard": true, "emotion": "confident" },
+  "Nova": { "evolution": true, "emotion": "visionary" }
+}
